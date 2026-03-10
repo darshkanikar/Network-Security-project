@@ -12,21 +12,3 @@ proxy/certs/server.crt
 # =============================================================
 app/uploads/*
 !app/uploads/.gitkeep
-
-# =============================================================
-# SENSITIVE PLANNING NOTES — keep off public repos
-# =============================================================
-attacks to do
-attacks to do.txt
-Possible_Vulnerabilities.txt
-cmds to run the webapp
-
-# =============================================================
-# OS / EDITOR JUNK
-# =============================================================
-.DS_Store
-Thumbs.db
-*.swp
-*.swo
-.idea/
-.vscode/
