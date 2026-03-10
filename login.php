@@ -12,6 +12,7 @@ $error = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!verify_csrf_token($_POST['csrf_token'])) {
+        log_activity($pdo, null, 'CSRF_FAILURE', 'CSRF token mismatch on login form');
         $error = "CSRF Token Validation Failed";
     }
     else {
@@ -29,21 +30,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 log_activity($pdo, null, 'LOGIN_BLOCKED', "Rate limited: $username from $ip");
             }
             else {
-                $stmt = $pdo->prepare("SELECT id, password_hash FROM users WHERE username = ?");
+                $stmt = $pdo->prepare("SELECT pehchan, gupt_sanket FROM upyogkarta WHERE naam = ?");
                 $stmt->execute([$username]);
                 $user = $stmt->fetch();
 
-                if ($user && password_verify($password, $user['password_hash'])) {
+                if ($user && password_verify($password, $user['gupt_sanket'])) {
                     // Successful login
                     session_regenerate_id(true);
-                    $_SESSION['user_id'] = $user['id'];
+                    $_SESSION['user_id'] = $user['pehchan'];
                     $_SESSION['username'] = $username;
                     $_SESSION['last_activity'] = time();
                     $_SESSION['session_created_at'] = time();
 
                     // Clear failed attempts on success
                     clear_login_attempts($pdo, $ip, $username);
-                    log_activity($pdo, $user['id'], 'LOGIN', 'User logged in successfully');
+                    log_activity($pdo, $user['pehchan'], 'LOGIN', 'User logged in successfully');
 
                     header("Location: dashboard.php");
                     exit();
@@ -82,13 +83,11 @@ endif; ?>
                     <div class="mb-3">
                         <label>Password</label>
                         <input type="password" name="password" class="form-control" required minlength="6"
-                            maxlength="14">
+                            maxlength="50">
                     </div>
                     <button type="submit" class="btn btn-primary w-100">Login</button>
                     <div class="mt-3 text-center">
                         <a href="register.php">Create an account</a>
-                        <span class="mx-2">|</span>
-                        <a href="forgot_password.php">Forgot Password?</a>
                     </div>
                 </form>
             </div>
