@@ -45,7 +45,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
                 else {
                     // Update password
-                    $new_hash = password_hash($new_password, PASSWORD_BCRYPT);
+                    $new_hash = password_hash($new_password, PASSWORD_ARGON2ID);
                     $stmt = $pdo->prepare("UPDATE upyogkarta SET gupt_sanket = ? WHERE pehchan = ?");
                     $stmt->execute([$new_hash, $user_id]);
 
@@ -91,14 +91,14 @@ endif; ?>
                     <div class="mb-3">
                         <label>New Password</label>
                         <input type="password" name="new_password" class="form-control" required minlength="6"
-                            maxlength="14">
-                        <small class="text-muted">6-14 characters, must include uppercase, lowercase, and a
-                            digit</small>
+                            maxlength="50">
+                        <small class="text-muted">6-50 characters, must include uppercase, lowercase, a digit, and a
+                            special character (e.g. @, #, !, $)</small>
                     </div>
                     <div class="mb-3">
                         <label>Confirm New Password</label>
                         <input type="password" name="confirm_password" class="form-control" required minlength="6"
-                            maxlength="14">
+                            maxlength="50">
                     </div>
                     <button type="submit" class="btn btn-primary w-100">Change Password</button>
                     <div class="mt-3 text-center">
