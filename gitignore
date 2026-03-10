@@ -1,0 +1,32 @@
+# =============================================================
+# SECRETS — never commit these
+# =============================================================
+secrets/
+
+# TLS private key and self-signed cert
+proxy/certs/server.key
+proxy/certs/server.crt
+
+# =============================================================
+# USER-UPLOADED CONTENT — runtime data, not source code
+# =============================================================
+app/uploads/*
+!app/uploads/.gitkeep
+
+# =============================================================
+# SENSITIVE PLANNING NOTES — keep off public repos
+# =============================================================
+attacks to do
+attacks to do.txt
+Possible_Vulnerabilities.txt
+cmds to run the webapp
+
+# =============================================================
+# OS / EDITOR JUNK
+# =============================================================
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+.idea/
+.vscode/
