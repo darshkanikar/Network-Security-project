@@ -15,20 +15,20 @@ if (isset($_GET['msg']) && $_GET['msg'] === 'profile_updated') {
 }
 
 // Fetch user details
-$stmt = $pdo->prepare("SELECT balance, full_name, bio, profile_image FROM users WHERE id = ?");
+$stmt = $pdo->prepare("SELECT shesh, poora_naam, parichay, chitra FROM upyogkarta WHERE pehchan = ?");
 $stmt->execute([$user_id]);
 $user = $stmt->fetch();
 
 // Fetch recent transactions
 $stmt = $pdo->prepare("
     SELECT t.*, 
-           u_sender.username AS sender_name, 
-           u_receiver.username AS receiver_name 
-    FROM transactions t
-    JOIN users u_sender ON t.sender_id = u_sender.id
-    JOIN users u_receiver ON t.receiver_id = u_receiver.id
-    WHERE t.sender_id = ? OR t.receiver_id = ?
-    ORDER BY t.timestamp DESC
+           u_sender.naam AS sender_name, 
+           u_receiver.naam AS receiver_name 
+    FROM lenden t
+    JOIN upyogkarta u_sender ON t.bhejne_wala = u_sender.pehchan
+    JOIN upyogkarta u_receiver ON t.pane_wala = u_receiver.pehchan
+    WHERE t.bhejne_wala = ? OR t.pane_wala = ?
+    ORDER BY t.samay DESC
     LIMIT 10
 ");
 $stmt->execute([$user_id, $user_id]);
@@ -49,13 +49,13 @@ require_once 'includes/header.php';
                 <?php
 endif; ?>
 
-                <img src="<?='uploads/' . sanitize_input($user['profile_image'])?>" class="rounded-circle mb-3"
-                    width="100" height="100" style="object-fit: cover;">
+                <img src="<?='uploads/' . sanitize_input($user['chitra'])?>" class="rounded-circle mb-3" width="100"
+                    height="100" style="object-fit: cover;">
                 <h4>
-                    <?= sanitize_input($user['full_name'] ?: $username)?>
+                    <?= sanitize_input($user['poora_naam'] ?: $username)?>
                 </h4>
                 <p class="text-muted">Balance: <strong>₹
-                        <?= number_format($user['balance'], 2)?>
+                        <?= number_format($user['shesh'], 2)?>
                     </strong></p>
                 <div class="d-grid gap-2">
                     <a href="profile.php" class="btn btn-outline-primary">Edit Profile</a>
@@ -83,14 +83,14 @@ endif; ?>
                         <tbody>
                             <?php foreach ($transactions as $t): ?>
                             <?php
-        $is_sender = $t['sender_id'] == $user_id;
+        $is_sender = $t['bhejne_wala'] == $user_id;
         $type = $is_sender ? 'Sent' : 'Received';
         $color = $is_sender ? 'text-danger' : 'text-success';
         $other_party = $is_sender ? $t['receiver_name'] : $t['sender_name'];
 ?>
                             <tr>
                                 <td>
-                                    <?= sanitize_input($t['timestamp'])?>
+                                    <?= sanitize_input($t['samay'])?>
                                 </td>
                                 <td><span class="<?= $color?>">
                                         <?= $type?>
@@ -100,10 +100,10 @@ endif; ?>
                                 </td>
                                 <td class="<?= $color?>">
                                     <?= $is_sender ? '-' : '+'?>₹
-                                    <?= number_format($t['amount'], 2)?>
+                                    <?= number_format($t['rashi'], 2)?>
                                 </td>
                                 <td>
-                                    <?= sanitize_input($t['comment'])?>
+                                    <?= sanitize_input($t['tippani'])?>
                                 </td>
                             </tr>
                             <?php
