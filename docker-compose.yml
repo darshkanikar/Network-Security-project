@@ -1,0 +1,81 @@
+version: '3.8'
+
+services:
+  proxy:
+    image: dhi.io/nginx:1@sha256:9683af47feae3bab0031b489ed85f93f340a0f8b83a2edccc9f761dbfce1bffd
+    ports:
+      - "8443:443"
+    volumes:
+      - ./proxy/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./proxy/certs:/etc/nginx/certs:ro
+    tmpfs:
+      - /run:uid=65532,gid=65532,mode=0700
+      - /var/cache/nginx:uid=65532,gid=65532,mode=0700
+      - /var/log/nginx:uid=65532,gid=65532,mode=0700
+    depends_on:
+      - web
+    networks:
+      - frontend
+    # Security hardening — same principle as web container
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    read_only: true
+
+  web:
+    build: .
+    volumes:
+      - ./:/var/www/html:ro
+      - uploads_data:/var/www/html/app/uploads
+    depends_on:
+      - db
+    environment:
+      - DB_HOST=db
+      - DB_NAME=asaNkrak_0sh
+      - DB_USER=u_py09Karta
+    secrets:
+      - db_password
+    networks:
+      - frontend
+      - backend
+    # Security hardening
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    user: "33:33" # www-data — Apache runs as non-root
+
+  db:
+    image: dhi.io/postgres:18@sha256:e8e5e72a4af490a8918fe5548e48166f574173207aa824bf9e7a1d343ffecd0a
+    restart: always
+    environment:
+      POSTGRES_DB: asaNkrak_0sh
+      POSTGRES_USER: u_py09Karta
+      POSTGRES_PASSWORD_FILE: /run/secrets/db_password
+    secrets:
+      - db_password
+    volumes:
+      - db_data:/var/lib/postgresql # Named volume covers both /16 and /18 data dirs
+      - ./database.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - backend
+    # Security hardening
+    read_only: true
+    tmpfs:
+      - /tmp
+      - /run/postgresql
+
+secrets:
+  db_password:
+    file: ./secrets/db_password.txt
+
+networks:
+  frontend:
+    driver: bridge
+  backend:
+    internal: true # Max isolation: no internet access for DB
+
+volumes:
+  db_data:
+  uploads_data:
