@@ -10,6 +10,8 @@ $search_query = '';
 
 if (isset($_GET['q'])) {
     $search_query = trim($_GET['q']);
+     // Server-side length limit (HTML maxlength can be bypassed)
+    $search_query = substr($search_query, 0, 18);
     if (!empty($search_query)) {
         // Prepared statement prevents SQL Injection
         // Escape LIKE wildcards to prevent DoS via wildcard flooding
@@ -31,7 +33,7 @@ require_once 'includes/header.php';
             <div class="card-body">
                 <form method="GET" action="" class="d-flex gap-2 mb-4">
                     <input type="text" name="q" class="form-control" placeholder="Search by username or name..."
-                        value="<?= sanitize_input($search_query)?>">
+                        value="<?= sanitize_input($search_query)?>" maxlength = "18">
                     <button type="submit" class="btn btn-primary">Search</button>
                 </form>
 
