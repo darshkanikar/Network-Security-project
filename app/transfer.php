@@ -24,6 +24,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $recipient_username = trim($_POST['recipient_username']);
         $amount = floatval($_POST['amount']);
         $comment = trim($_POST['comment']);
+        // Server-side length limits (HTML maxlength can be bypassed)
+        if (strlen($recipient_username) > 18) {
+            $error = "Username must be 18 characters or less.";
+        }
 
         // Validate comment length
         if (strlen($comment) > 200) {
@@ -126,7 +130,7 @@ endif; ?>
                         <label>Recipient Username</label>
                         <input type="text" name="recipient_username" class="form-control"
                             placeholder="Enter recipient's username" value="<?= sanitize_input($to_username)?>"
-                            required>
+                            required maxlength = "18">
                     </div>
 
                     <div class="mb-3">
